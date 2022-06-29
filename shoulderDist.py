@@ -62,6 +62,6 @@ if __name__ == "__main__":
 
     for i in range(100):
         try:
-            shoulder("/Users/nicholas717/PycharmProjects/PythonProject/test/body" + str(i) + ".jpg")
+            shoulder("/Users/nicholas717/PycharmProjects/PythonProject/test_image/body" + str(i) + ".jpg")
         except:
             print(i, " Not work!")

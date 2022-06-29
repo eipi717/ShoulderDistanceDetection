@@ -6,7 +6,7 @@ import cv2
 import imutils
 
 # input image
-INPUT_FILE='/Users/nicholas717/Downloads/Work/code/report_shoulder/gp1.jpg'
+INPUT_FILE='/Users/nicholas717/Downloads/Work/code/report_shoulder/5.jpg'
 
 # labels file's location
 LABELS_FILE='/Users/nicholas717/PycharmProjects/PythonProject/data/coco.names'
@@ -102,9 +102,9 @@ if len(idxs) > 0:
 
 		# Create bounding box, for the half of body
 		cv2.rectangle(image, (x, y), (x + w, y + h), color, 2)
-		body = image[y//2: (y+h)//2, x: x+w]
-		cv2.imwrite('./test/body' + str(i) + '.jpg', body)
+		body = image[y: (y+h)//2, x: (x+w)]
+		cv2.imwrite('./test_image/body' + str(i) + '.jpg', body)
 		text = "{}: {:.4f}".format(LABELS[classIDs[i]], confidences[i])
 
 # show the output image
-cv2.imwrite("./test/example.png", image)
+cv2.imwrite("./test_image/example.png", image)
