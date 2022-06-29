@@ -6,19 +6,19 @@ import cv2
 import imutils
 
 # input image
-INPUT_FILE='/Users/nicholas717/Downloads/Work/code/report_shoulder/5.jpg'
+INPUT_FILE = '/Users/nicholas717/Downloads/Work/code/report_shoulder/2.jpg'
 
 # labels file's location
-LABELS_FILE='/Users/nicholas717/PycharmProjects/PythonProject/data/coco.names'
+LABELS_FILE = '/Users/nicholas717/PycharmProjects/PythonProject/data/coco.names'
 
 # yolo.cfg file's location
-CONFIG_FILE='/Users/nicholas717/PycharmProjects/PythonProject/cfg/yolov3.cfg'
+CONFIG_FILE = '/Users/nicholas717/PycharmProjects/PythonProject/cfg/yolov3.cfg'
 
 # yolo.weights's location
-WEIGHTS_FILE='/Users/nicholas717/PycharmProjects/PythonProject/yolov3.weights'
+WEIGHTS_FILE = '/Users/nicholas717/PycharmProjects/PythonProject/yolov3.weights'
 
 # threshold value
-CONFIDENCE_THRESHOLD=0.3
+CONFIDENCE_THRESHOLD = 0.3
 
 
 LABELS = open(LABELS_FILE).read().strip().split("\n")
@@ -29,8 +29,6 @@ COLORS = np.random.randint(0, 255, size=(len(LABELS), 3), dtype="uint8")
 net = cv2.dnn.readNetFromDarknet(CONFIG_FILE, WEIGHTS_FILE)
 
 image = cv2.imread(INPUT_FILE)
-#image = cv2.resize(image, (800, 600))
-#image = imutils.resize(image, height = image.shape[0] // 2)
 (H, W) = image.shape[:2]
 print("img dim: ", (H, W))
 
@@ -39,8 +37,7 @@ ln = net.getLayerNames()
 ln = [ln[i-1] for i in net.getUnconnectedOutLayers()]
 
 
-blob = cv2.dnn.blobFromImage(image, 1 / 255.0, (416, 416),
-	swapRB=True, crop=False)
+blob = cv2.dnn.blobFromImage(image, 1 / 255.0, (416, 416), swapRB=True, crop=False)
 net.setInput(blob)
 start = time.time()
 layerOutputs = net.forward(ln)
@@ -87,8 +84,7 @@ for output in layerOutputs:
 
 # apply non-maxima suppression to suppress weak, overlapping bounding
 # boxes
-idxs = cv2.dnn.NMSBoxes(boxes, confidences, CONFIDENCE_THRESHOLD,
-	CONFIDENCE_THRESHOLD)
+	idxs = cv2.dnn.NMSBoxes(boxes, confidences, CONFIDENCE_THRESHOLD, CONFIDENCE_THRESHOLD)
 
 # ensure at least one detection exists
 if len(idxs) > 0:
@@ -102,7 +98,7 @@ if len(idxs) > 0:
 
 		# Create bounding box, for the half of body
 		cv2.rectangle(image, (x, y), (x + w, y + h), color, 2)
-		body = image[y: (y+h)//2, x: (x+w)]
+		body = image[y: (y+h)//3, x: (x+w)]
 		cv2.imwrite('./test_image/body' + str(i) + '.jpg', body)
 		text = "{}: {:.4f}".format(LABELS[classIDs[i]], confidences[i])
 

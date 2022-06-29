@@ -11,10 +11,11 @@ def shoulder(img_path):
 
     with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as pose:
         img = cv2.imread(img_path)
-        print(img.shape)
 
         # Resize the cropped image, in aspect ratio
-        img = imutils.resize(image=img, width=500, height=200)
+        img = imutils.resize(image=img, width=500)
+        print(img.shape)
+
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         results = pose.process(img)
         img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
