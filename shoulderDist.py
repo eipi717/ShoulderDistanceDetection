@@ -1,3 +1,6 @@
+# TODO: check if the object is distorted first
+#  **** length of the left and right shoulders are different based on the face, ****
+
 import mediapipe as mp
 import cv2
 import numpy as np
@@ -25,7 +28,7 @@ def shoulder(img_path):
         except:
             pass
 
-            # Render detections
+        # Render detections
         mp_drawing.draw_landmarks(img, results.pose_landmarks, mp_pose.POSE_CONNECTIONS,
                                   mp_drawing.DrawingSpec(color=(245, 117, 66), thickness=2, circle_radius=2),
                                   mp_drawing.DrawingSpec(color=(245, 66, 230), thickness=2, circle_radius=2)
@@ -40,16 +43,54 @@ def shoulder(img_path):
         shoulder_right = np.array((landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER.value].x, landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER.value].y)) * img_wh
         shoulder_left = np.array((landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value].x, landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value].y)) * img_wh
 
-        cv2.circle(img=img, center=(round((shoulder_right[0])), round(shoulder_right[1])), radius=15, color=(0, 0, 255), thickness=3)
-        cv2.circle(img=img, center=(round((shoulder_left[0])), round(shoulder_left[1])), radius=15, color=(0, 0, 255), thickness=3)
+        # Find the mid-point of the face
+        right_eye_inner = np.array((landmarks[mp_pose.PoseLandmark.RIGHT_EYE_INNER.value].x, landmarks[mp_pose.PoseLandmark.RIGHT_EYE_INNER.value].y)) * img_wh
+        left_eye_inner = np.array((landmarks[mp_pose.PoseLandmark.LEFT_EYE_INNER.value].x, landmarks[mp_pose.PoseLandmark.LEFT_EYE_INNER.value].y)) * img_wh
+        head_mid = selfmath.MidPt(right_eye_inner, left_eye_inner)
+        head_mid = [int(x) for x in head_mid]
+
+        # Find the mid-point of the lower part of the body
+        left_foot_index = np.array((landmarks[mp_pose.PoseLandmark.LEFT_FOOT_INDEX.value].x, landmarks[mp_pose.PoseLandmark.LEFT_FOOT_INDEX.value].y)) * img_wh
+        right_foot_index = np.array((landmarks[mp_pose.PoseLandmark.RIGHT_FOOT_INDEX.value].x, landmarks[mp_pose.PoseLandmark.RIGHT_FOOT_INDEX.value].y)) * img_wh
+        foot_mid = selfmath.MidPt(left_foot_index, right_foot_index)
+        foot_mid = [int(x) for x in foot_mid]
+
+        # Find the distortion of the shoulders
+        # by comparing the distance between head_mid and each shoulder
+        dist_leftShoulder2head = selfmath.dist(shoulder_left, head_mid)
+        dist_rightShoulder2head = selfmath.dist(shoulder_right, head_mid)
+
+        # Draw line for indication
+        cv2.line(img, head_mid, (head_mid[0], foot_mid[1]), (0, 255, 0), 3)
+
+        # Calculate the object height
+        # Consider the vertical direction only so the line is straight
+        body_dist_vert = np.abs(head_mid[1] - foot_mid[1])
+        print("Body height: ", body_dist_vert)
 
         # Print the pixel coordinates of left and right shoulders
-        print("LEFT shoulder: ", tuple(shoulder_left))
-        print("RIGHT shoulder: ", tuple(shoulder_right))
+        #
+        #print("LEFT shoulder: ", tuple(shoulder_left))
+        #print("RIGHT shoulder: ", tuple(shoulder_right))
+        #
 
         # Print the Distance between two shoulders
-        shoulderDist = selfmath.dist(shoulder_right, shoulder_left)
-        print("Dist: ", round(shoulderDist, 2))
+        shoulderDist = round(selfmath.dist(shoulder_right, shoulder_left), 2)
+        print(f"ShoulderDist: {shoulderDist}")
+
+        # Find and print the ratio between shoulderDistance and object height
+        ratio_percentage = round(((shoulderDist / body_dist_vert) * 100), 2)
+        print(f"Ratio of shoulder size to Body height: {ratio_percentage} \n"
+              f"Shoulder distance is {ratio_percentage}% of the object height")
+        print(f"Distance between face and left shoulder: {dist_leftShoulder2head}\n"
+              f"Distance between face and right shoulder: {dist_rightShoulder2head}")
+
+        if (np.abs(dist_leftShoulder2head - dist_rightShoulder2head) > 50):
+            print("The body turned!")
+            if (dist_rightShoulder2head > dist_leftShoulder2head):
+                print("The shoulder turned right! ")
+            elif (dist_leftShoulder2head > dist_rightShoulder2head):
+                print("The shoulder turned left! ")
 
         # Display the cropped image
         cv2.imshow('Hello', img)
@@ -70,5 +111,4 @@ if __name__ == "__main__":
             try:
                 shoulder("/Users/nicholas717/PycharmProjects/PythonProject/test_image/" + str(filename))
             except:
-                # Print error message if the detection fail
-                print(filename, "Not work!")
+                print(f'{filename} not working!')
