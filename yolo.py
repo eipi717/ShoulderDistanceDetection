@@ -3,10 +3,9 @@
 import numpy as np
 import time
 import cv2
-import imutils
 
 # input image
-INPUT_FILE = '/Users/nicholas717/Downloads/Work/code/report_shoulder/2.jpg'
+INPUT_FILE = '/Users/nicholas717/Downloads/Work/code/report_shoulder/78.jpg'
 
 # labels file's location
 LABELS_FILE = '/Users/nicholas717/PycharmProjects/PythonProject/data/coco.names'
@@ -96,9 +95,9 @@ if len(idxs) > 0:
 
 		color = [int(c) for c in COLORS[classIDs[i]]]
 
-		# Create bounding box, for the half of body
+		# Create bounding box, for the full body
 		cv2.rectangle(image, (x, y), (x + w, y + h), color, 2)
-		body = image[y: (y+h)//3, x: (x+w)]
+		body = image[y: (y+h), x: (x+w)]
 		cv2.imwrite('./test_image/body' + str(i) + '.jpg', body)
 		text = "{}: {:.4f}".format(LABELS[classIDs[i]], confidences[i])
 
