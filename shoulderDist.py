@@ -52,7 +52,6 @@ def shoulder(img_path):
 
         left_eye_inner = np.array((landmarks[mp_pose.PoseLandmark.LEFT_EYE_INNER.value].x,
                                    landmarks[mp_pose.PoseLandmark.LEFT_EYE_INNER.value].y)) * img_wh
-
         head_mid = selfmath.MidPt(right_eye_inner, left_eye_inner)
         head_mid = [int(x) for x in head_mid]
 
@@ -62,45 +61,47 @@ def shoulder(img_path):
 
         right_hip = np.array((landmarks[mp_pose.PoseLandmark.RIGHT_HIP.value].x,
                               landmarks[mp_pose.PoseLandmark.RIGHT_HIP.value].y)) * img_wh
-
         hip_mid = selfmath.MidPt(left_hip, right_hip)
         hip_mid = [int(x) for x in hip_mid]
+
         # Find the hip width
         hip_width = selfmath.dist(left_hip, right_hip)
         hip_width = round(hip_width, 2)
-
-        # Find the distortion of the shoulders
-        # by comparing the distance between head_mid and each shoulder
-        dist_leftShoulder2head = selfmath.dist(shoulder_left, head_mid)
-        dist_rightShoulder2head = selfmath.dist(shoulder_right, head_mid)
-
-        # Calculate the object height
-        # Consider the vertical direction only so the line is straight
-        body_dist_vert = selfmath.dist(hip_mid, head_mid)
 
         # Correct the Distance between two shoulders to 2 decimals
         shoulderDist = round(selfmath.dist(shoulder_right, shoulder_left), 2)
         hip_shoulder = round(shoulderDist / hip_width, 2)
 
-        print(f"**************************************************************")
-        print(f"ShoulderDist = {shoulderDist}, body height = {body_dist_vert}, hip width = {hip_width}")
-        hip_shoulder = round(shoulderDist / hip_width, 2)
+        print(f"ShoulderDist = {shoulderDist}, hip width = {hip_width}")
+
+        if (hip_shoulder >= 1.7):
+            print(f"It is male, the ratio of shoulder width to hip width is: {hip_shoulder}")
+        else:
+            print(f"It is female, the ratio of shoulder width to hip width is: {hip_shoulder}")
+
+        # --------  Distortion ---------
+        # Find the distortion of the shoulders
+        # by comparing the distance between head_mid and each shoulder
+        dist_leftShoulder2head = selfmath.dist(shoulder_left, head_mid)
+        dist_rightShoulder2head = selfmath.dist(shoulder_right, head_mid)
 
         # Find and print the ratio between shoulderDistance and object height
-        ratio_percentage = round(((shoulderDist / body_dist_vert)), 2)
-        print(f"Ratio of Shoulder distance to object height = {ratio_percentage}")
+
         print(f"Distance between face and left shoulder: {dist_leftShoulder2head}\n"
-              f"Distance between face and right shoulder: {dist_rightShoulder2head}\n"
-              f"**************************************************************")
+              f"Distance between face and right shoulder: {dist_rightShoulder2head}"
+              )
 
         # Check distortion by comparing the difference of the shoulders distance to face
-        if (np.abs(dist_leftShoulder2head - dist_rightShoulder2head) > 50):
+        if (np.abs(dist_leftShoulder2head - dist_rightShoulder2head) > 20):
             print("The body turned!")
             if (dist_rightShoulder2head > dist_leftShoulder2head):
                 print("The shoulder turned right! ")
             elif (dist_leftShoulder2head > dist_rightShoulder2head):
                 print("The shoulder turned left! ")
+        else:
+            print("no distortion detected!")
 
+        print("**************************************************************")
         # Display the cropped image
         cv2.imshow('Hello', img)
 
