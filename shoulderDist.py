@@ -1,6 +1,3 @@
-# TODO: check if the object is distorted first
-#  **** length of the left and right shoulders are different based on the face, ****
-
 import mediapipe as mp
 import cv2
 import numpy as np
@@ -36,9 +33,9 @@ def shoulder(img_path):
         img_height, img_width, _ = img.shape
         img_wh = np.array((img_width, img_height))
 
+        # --------  Shoulder Width ---------
         # Convert from normalized coordinates to pixel coordinates
         # By multiplying the image shape
-
         # Find the location of each side of the shoulder
         shoulder_right = np.array((landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER.value].x,
                                    landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER.value].y)) * img_wh
@@ -47,6 +44,7 @@ def shoulder(img_path):
                                   landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value].y)) * img_wh
 
         # Find the mid-point of the face
+        # By finding the mid-point of two eyes
         right_eye_inner = np.array((landmarks[mp_pose.PoseLandmark.RIGHT_EYE_INNER.value].x,
                                     landmarks[mp_pose.PoseLandmark.RIGHT_EYE_INNER.value].y)) * img_wh
 
@@ -80,18 +78,16 @@ def shoulder(img_path):
             print(f"It is female, the ratio of shoulder width to hip width is: {hip_shoulder}")
 
         # --------  Distortion ---------
-        # Find the distortion of the shoulders
-        # by comparing the distance between head_mid and each shoulder
+        # Find the distortion of the body
+        # by comparing the distance between the head and each shoulder
         dist_leftShoulder2head = selfmath.dist(shoulder_left, head_mid)
         dist_rightShoulder2head = selfmath.dist(shoulder_right, head_mid)
-
-        # Find and print the ratio between shoulderDistance and object height
 
         print(f"Distance between face and left shoulder: {dist_leftShoulder2head}\n"
               f"Distance between face and right shoulder: {dist_rightShoulder2head}"
               )
 
-        # Check distortion by comparing the difference of the shoulders distance to face
+        # Check distortion by comparing the distance between each shoulder to the face
         if (np.abs(dist_leftShoulder2head - dist_rightShoulder2head) > 20):
             print("The body turned!")
             if (dist_rightShoulder2head > dist_leftShoulder2head):
@@ -101,9 +97,8 @@ def shoulder(img_path):
         else:
             print("no distortion detected!")
 
-        print("**************************************************************")
         # Display the cropped image
-        cv2.imshow('Hello', img)
+        cv2.imshow('test', img)
 
         # Delay between every fram
         cv2.waitKey(delay=0)
