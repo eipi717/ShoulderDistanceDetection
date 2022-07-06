@@ -1,15 +1,26 @@
 # ShoulderDistanceDetection
+Use shoulder width to classifying gender, in this project, the ratio of shoulder width and hip width were used.
+The ratio from male should be larger than female. [source]
 
-## YOLO weights
+The overall accuracy of over 40 body attain 72%
 
-#### You can download *yolov3.weights* from [here]
+---
+### YOLO weights
+ 
+You can download *yolov3.weights* from [here]
 
-Please change the directories name, if needed.
-#
+---
+### Required packages
 
 Install the required package by the following command
 ```
 pip install -r requirements.txt
 ```
+---
+### Additional information
+Please change the directories name, if needed.
+
+
 
 [here]: https://pjreddie.com/darknet/yolo/
+[source]: https://www.drawingforall.net/human-body-proportions/
