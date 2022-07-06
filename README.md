@@ -1,6 +1,7 @@
 # ShoulderDistanceDetection
-Use shoulder width to classifying gender, in this project, the ratio of shoulder width and hip width were used.
-The ratio from male should be larger than female. [source]
+Use shoulder width to classifying gender. 
+According to the [source], the ratio of shoulder width and hip width were used.
+The ratio from male should be larger than female.
 
 The overall accuracy of over 40 body attain 72%
 
