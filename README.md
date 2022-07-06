@@ -1,4 +1,4 @@
-# ShoulderDistanceDetection
+# Shoulder Distance Detection
 Use shoulder width to classifying gender. 
 According to the [source], the ratio of shoulder width and hip width were used.
 The ratio from male should be larger than female.
